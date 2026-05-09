@@ -24,7 +24,7 @@ const team = [
   },
   {
     name: "Viraj Kumar",
-    role: "Database and AI Developer",
+    role: "Database developement",
     icon: <Sigma className="text-amber-500" />,
     bio: "The brain behind the Database and AI development of the project.",
     skills: ["Python", "AI", "Database"],
