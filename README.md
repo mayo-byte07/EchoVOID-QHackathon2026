@@ -1,40 +1,115 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EchoVOID
 
-## Getting Started
+> **QHackathon 2026 Project** — Short-distance loud clap detection system with spatial audio visualization.
 
-First, run the development server:
+A full-stack IoT project combining ESP32-based acoustic sensing with a modern Next.js web interface for real-time event visualization and analytics.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Architecture
+
+```
+┌─────────────────┐      WiFi/Serial       ┌─────────────────┐
+│   ESP32 + 4x    │ ─────────────────────> │   Next.js App   │
+│   INMP441 Mics  │      Clap Events       │   (Dashboard)   │
+└─────────────────┘                        └─────────────────┘
+                                                    │
+                                                    ▼
+                                           ┌─────────────────┐
+                                           │    Supabase     │
+                                           │  (Events DB)    │
+                                           └─────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Hardware (ESP32)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Components
+| Part | Quantity | Purpose |
+|------|----------|---------|
+| ESP32 DevKit | 1 | Main controller |
+| INMP441 I2S Mic | 4 | Quad-channel audio capture |
+| Passive Buzzer | 1 | Tactile feedback |
 
-## Learn More
+### Pinout
+```cpp
+// Mic Pair A (I2S Bus 0)
+I2S_A_SCK = 14   // Bit Clock
+I2S_A_WS  = 15   // Word Select
+I2S_A_SD  = 21   // Serial Data
 
-To learn more about Next.js, take a look at the following resources:
+// Mic Pair B (I2S Bus 1)
+I2S_B_SCK = 18
+I2S_B_WS  = 19
+I2S_B_SD  = 23
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+// Buzzer
+BUZZER_PIN = 25
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Key Parameters
+```cpp
+int CLAP_THRESHOLD = 25000;  // Detection sensitivity (higher = louder required)
+int BUZZ_DURATION  = 150;    // Feedback duration (ms)
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Web Application
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# EchoVOID
->>>>>>> 6f5b12299616b1c3eacc0badbc8281331f1cf2e4
+### Tech Stack
+- **Framework**: Next.js 16 + React 19
+- **Styling**: Tailwind CSS v4
+- **3D Viz**: React Three Fiber + Three.js
+- **Maps**: MapLibre GL
+- **State**: Zustand
+- **Database**: Supabase
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Start dev server
+npm run dev
+```
+
+---
+
+## Project Structure
+
+```
+echo-void-web/
+├── Echo Esp32/
+│   ├── Echo.ino          # Main firmware
+│   └── config.h          # Pin & audio settings
+├── src/
+│   ├── app/              # Next.js routes
+│   ├── components/       # React components
+│   ├── store/            # Zustand state
+│   └── lib/              # Utilities
+├── public/               # Static assets
+└── package.json
+```
+
+---
+
+## How It Works
+
+1. **Audio Capture**: 4x INMP441 microphones stream 16kHz audio via dual I2S buses
+2. **Detection**: ESP32 compares peak amplitude against `CLAP_THRESHOLD`
+3. **Feedback**: Buzzer sounds for 150ms on valid detection
+4. **Transmission**: Events sent to web dashboard via WebSocket/Serial
+5. **Visualization**: 3D spatial map shows clap location and intensity
+
+---
+
+## License
+
+MIT — Built for QHackathon 2026
